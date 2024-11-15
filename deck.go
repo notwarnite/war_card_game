@@ -1,38 +1,54 @@
 package main
 
 import (
-	"math/rand"
-	"time"
+	"fmt"
+	"strings"
+
+	"github.com/fatih/color"
 )
 
 type Card struct {
-    Rank string
-    Suit string
+	Suit   string
+	Value  string
+	Points int
 }
 
-type Deck struct {
-    Cards []Card
+func (c Card) String() string {
+	suitSymbol := c.Suit
+	var colorPrint func(format string, a ...interface{}) string
+
+	switch c.Suit {
+	case "♥", "♦":
+		colorPrint = color.New(color.FgRed).SprintfFunc()
+	case "♠", "♣":
+		colorPrint = color.New(color.FgWhite).SprintfFunc()
+	}
+
+	return fmt.Sprintf(`
+┌─────────┐
+│ %2s     │
+│         │
+│    %s   │
+│         │
+│      %2s│
+└─────────┘`, 
+		colorPrint(c.Value), 
+		colorPrint(suitSymbol), 
+		colorPrint(c.Value))
 }
 
-func NewDeck() *Deck {
-    suits := []string{"Hearts", "Diamonds", "Clubs", "Spades"}
-    ranks := []string{"2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"}
-    
-    deck := &Deck{}
-    
-    for _, suit := range suits {
-        for _, rank := range ranks {
-            deck.Cards = append(deck.Cards, Card{Rank: rank, Suit: suit})
-        }
-    }
-    
-    return deck
+func displayCards(card1, card2 Card) {
+	lines1 := strings.Split(card1.String(), "\n")
+	lines2 := strings.Split(card2.String(), "\n")
+	
+	fmt.Println("\nPlayer 1     Player 2")
+	for i := 0; i < len(lines1); i++ {
+		fmt.Printf("%s   %s\n", lines1[i], lines2[i])
+	}
 }
 
-func (d *Deck) Shuffle() {
-    rand.Seed(time.Now().UnixNano())
-    for i := range d.Cards {
-        j := rand.Intn(i + 1)
-        d.Cards[i], d.Cards[j] = d.Cards[j], d.Cards[i]
-    }
+func displayScores(score1, score2 int) {
+	fmt.Println("\nScores:")
+	fmt.Printf("Player 1: %d  Player 2: %d\n", score1, score2)
+	fmt.Println(strings.Repeat("-", 30))
 }
